@@ -167,6 +167,18 @@ function splitHeroTitleLetters(){
 }
 splitHeroTitleLetters();
 
+// Utilise les dimensions de mise en page : les oscillations ne déplacent pas l'ancrage.
+function syncCloudBackdrop() {
+  stormLayer.style.setProperty('--title-left', heroTitle.offsetLeft + 'px');
+  stormLayer.style.setProperty('--title-top', heroTitle.offsetTop + 'px');
+  stormLayer.style.setProperty('--title-width', heroTitle.offsetWidth + 'px');
+  stormLayer.style.setProperty('--title-height', heroTitle.offsetHeight + 'px');
+}
+syncCloudBackdrop();
+new ResizeObserver(syncCloudBackdrop).observe(heroTitle);
+window.addEventListener('resize', syncCloudBackdrop);
+document.fonts.ready.then(syncCloudBackdrop);
+
 function startCloudLightning(){
   const triggerFlash = cloud => {
     if (cloud.classList.contains('flash-hit')) return;

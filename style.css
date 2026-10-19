@@ -14,7 +14,7 @@
   font-display: swap;
 }
 
-:root { --rust: #7a1f0b; }
+:root { --rust: #7a1f0b; --cloud-color: #86170e; }
 
 * { box-sizing: border-box; }
 html, body {
@@ -56,6 +56,14 @@ body.locked { overflow: hidden; }
   opacity: 0;
   overflow: hidden;
 }
+/* La nappe suit les dimensions du titre, même après le chargement des polices. */
+.cloud-backdrop {
+  position: absolute;
+  left: calc(var(--title-left, 3.65vw) - 35px);
+  top: calc(var(--title-top, 25.4vh) - 25px);
+  width: calc(var(--title-width, 40vw) + 70px);
+  height: calc(var(--title-height, 23vw) + 50px);
+}
 .cloud {
   position: absolute;
   opacity: 0;
@@ -74,19 +82,19 @@ body.locked { overflow: hidden; }
   object-fit: contain;
   display: block;
   opacity: .95;
-  filter: saturate(1.06) contrast(1.08);
+  filter: url("#cloudTint");
   /* Garde-fou : aucun pixel résiduel ne peut dessiner un rectangle. */
   -webkit-mask-image: radial-gradient(ellipse at center, #000 32%, transparent 70%);
   mask-image: radial-gradient(ellipse at center, #000 32%, transparent 70%);
 }
-.c2 .cloud-img, .c5 .cloud-img, .c8 .cloud-img { transform: scaleX(-1); }
-.c4 .cloud-img, .c9 .cloud-img { transform: rotate(-8deg); }
+.c2 .cloud-img, .c5 .cloud-img { transform: scaleX(-1); }
+.c4 .cloud-img { transform: rotate(-8deg); }
 .cloud-flash {
   position: absolute;
   inset: 20%;
   opacity: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse, rgba(239,167,105,.72), rgba(122,31,11,.3) 38%, transparent 68%);
+  background: radial-gradient(ellipse, rgba(184,66,48,.58), rgba(134,23,14,.3) 38%, transparent 68%);
   filter: blur(16px);
   mix-blend-mode: screen;
 }
@@ -95,20 +103,16 @@ body.locked { overflow: hidden; }
   animation: cloudFloat var(--drift-duration, 6s) ease-in-out infinite;
   animation-delay: var(--drift-delay, 0s);
 }
-.c1 { left: -12vw; top: -12vh; width: 47vw; height: 29vw; --drift-delay: -.2s; --drift-duration: 6.8s; }
-.c2 { left: 13vw; top: -8vh; width: 44vw; height: 27vw; --drift-delay: -.9s; --drift-duration: 7.4s; }
-.c3 { left: -12vw; top: 15vh; width: 42vw; height: 26vw; --drift-delay: -1.4s; }
-.c4 { left: 18vw; top: 18vh; width: 36vw; height: 23vw; --drift-delay: -2.1s; --drift-duration: 6.5s; }
-.c5 { left: -13vw; top: 38vh; width: 48vw; height: 30vw; --drift-delay: -2.6s; --drift-duration: 7.2s; }
-.c6 { left: 17vw; top: 44vh; width: 36vw; height: 23vw; --drift-delay: -3.1s; }
-.c7 { left: 1vw; top: 8vh; width: 30vw; height: 19vw; --drift-delay: -1.7s; --drift-duration: 5.8s; }
-.c8 { left: 27vw; top: 3vh; width: 30vw; height: 19vw; --drift-delay: -3.8s; --drift-duration: 7.6s; }
-.c9 { left: 26vw; top: 34vh; width: 30vw; height: 19vw; --drift-delay: -4.5s; --drift-duration: 6.4s; }
-.c10 { left: -5vw; top: 63vh; width: 38vw; height: 24vw; --drift-delay: -2.8s; --drift-duration: 7s; }
+/* Cinq volumes superposés : un fond compact plutôt que des nuages dispersés. */
+.c1 { left: -8%; top: -8%; width: 92%; height: 63%; --drift-delay: -.2s; --drift-duration: 5.8s; }
+.c2 { left: 24%; top: -1%; width: 80%; height: 60%; --drift-delay: -1.4s; --drift-duration: 6.4s; }
+.c3 { left: -12%; top: 26%; width: 96%; height: 65%; --drift-delay: -2.8s; --drift-duration: 5.6s; }
+.c4 { left: 18%; top: 35%; width: 82%; height: 61%; --drift-delay: -3.6s; --drift-duration: 6.2s; }
+.c5 { left: -10%; top: 57%; width: 82%; height: 56%; --drift-delay: -1.8s; --drift-duration: 6s; }
 
 @keyframes cloudFloat {
-  0%, 100% { translate: -7px -14px; rotate: -.6deg; }
-  50% { translate: 9px 17px; rotate: .8deg; }
+  0%, 100% { translate: -16px -32px; rotate: -1.6deg; }
+  50% { translate: 18px 34px; rotate: 1.8deg; }
 }
 @keyframes cloudFlash {
   0% { opacity: 0; }
@@ -336,12 +340,12 @@ body.locked { overflow: hidden; }
   filter: drop-shadow(13px 16px 0 rgba(0,0,0,.82)) drop-shadow(0 22px 26px rgba(0,0,0,.52));
 }
 .nav-item.is-floating .btn-float {
-  animation: metalFloat 2.85s ease-in-out infinite;
+  animation: metalFloat 3.6s ease-in-out infinite;
   animation-delay: var(--delay);
 }
 @keyframes metalFloat {
-  0%, 100% { translate: 0 -10px; rotate: calc(var(--float-rot) * -1); }
-  50% { translate: 0 16px; rotate: var(--float-rot); }
+  0%, 100% { translate: -8px -28px; rotate: calc(var(--float-rot) * -2.2); }
+  50% { translate: 9px 30px; rotate: calc(var(--float-rot) * 2.2); }
 }
 
 .liquid-btn {
@@ -487,16 +491,6 @@ body.locked { overflow: hidden; }
 @media (max-width: 950px) {
 
   .storm-layer { opacity: .92; }
-  .c1 { left: -24vw; top: -2vh; width: 75vw; height: 47vw; }
-  .c2 { left: 17vw; top: 0; width: 66vw; height: 42vw; }
-  .c3 { left: -21vw; top: 23vh; width: 70vw; height: 44vw; }
-  .c4 { left: 17vw; top: 29vh; width: 60vw; height: 38vw; }
-  .c5 { left: -19vw; top: 46vh; width: 74vw; height: 47vw; }
-  .c6 { left: 20vw; top: 57vh; width: 60vw; height: 38vw; }
-  .c7 { left: -7vw; top: 11vh; width: 54vw; height: 34vw; }
-  .c8 { left: 48vw; top: 10vh; width: 50vw; height: 32vw; }
-  .c9 { left: 43vw; top: 44vh; width: 50vw; height: 32vw; }
-  .c10 { left: -12vw; top: 72vh; width: 65vw; height: 41vw; }
   .hero-title {
     top: 10vh;
     left: 5vw;
