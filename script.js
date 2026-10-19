@@ -239,8 +239,9 @@ function launch(){
     { x: '-6vw', y: '-22vh', scale: .68 }
   ];
   clouds.forEach((cloud, i) => {
+    const from = cloudFrom[i % cloudFrom.length];
     tl.fromTo(cloud,
-      { opacity: 0, x: cloudFrom[i].x, y: cloudFrom[i].y, scale: cloudFrom[i].scale, filter: 'blur(18px)' },
+      { opacity: 0, x: from.x, y: from.y, scale: from.scale, filter: 'blur(18px)' },
       { opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(.35px)', duration: 1.3, ease: 'expo.out' },
       2.10 + i * .06
     );
@@ -275,12 +276,15 @@ function launch(){
     tl.to('.hero-title .char', { '--spark': 0, duration: .25, stagger: .012 }, 3.78);
   }
 
+  // Les flottements démarrent après toutes les entrées, sur des couches séparées.
   tl.call(() => {
+    document.body.classList.remove('locked');
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.add('is-floating'));
     heroTitle.classList.add('is-fixed');
     stormLayer.classList.add('is-live');
     startElectricTitleFlicker();
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startCloudLightning();
-  }, null, 3.88);
+  }, null, 4.25);
 
   // Entrée des boutons : ils glissent depuis le flux de métal liquide.
   tl.to('.nav-item', {
@@ -291,11 +295,7 @@ function launch(){
     filter: 'none',
     stagger: .09,
     duration: .92,
-    ease: 'expo.out',
-    onComplete: () => {
-      document.body.classList.remove('locked');
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.add('is-floating'));
-    }
+    ease: 'expo.out'
   }, 2.90);
 }
 

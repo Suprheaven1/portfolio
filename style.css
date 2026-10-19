@@ -14,6 +14,8 @@
   font-display: swap;
 }
 
+:root { --rust: #7a1f0b; }
+
 * { box-sizing: border-box; }
 html, body {
   margin: 0;
@@ -57,71 +59,56 @@ body.locked { overflow: hidden; }
 .cloud {
   position: absolute;
   opacity: 0;
-  filter: blur(.45px);
-  transform: translate3d(0, 0, 0) scale(1);
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
+}
+/* GSAP anime l'entrée externe ; cette couche flotte indépendamment. */
+.cloud-drift {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  will-change: translate;
 }
 .cloud-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
-  position: relative;
-  z-index: 1;
-  opacity: 1;
-  mix-blend-mode: normal;
-  filter: saturate(.92) contrast(1.24) brightness(.96);
+  opacity: .95;
+  filter: saturate(1.06) contrast(1.08);
+  /* Garde-fou : aucun pixel résiduel ne peut dessiner un rectangle. */
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 32%, transparent 70%);
+  mask-image: radial-gradient(ellipse at center, #000 32%, transparent 70%);
 }
-/* Une seconde silhouette renforce la matière sans étaler les contours. */
-.cloud-density {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: .72;
-  filter: saturate(.8) contrast(1.3) brightness(.72);
-}
-.cloud::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  inset: 8% 8% 10% 8%;
-  opacity: .32;
-  pointer-events: none;
-  background:
-    radial-gradient(28% 24% at 50% 50%, rgba(255,250,240,.24), transparent 70%),
-    radial-gradient(56% 46% at 54% 52%, rgba(120,0,28,.26), transparent 78%);
-  filter: blur(12px);
-  mix-blend-mode: screen;
-}
+.c2 .cloud-img, .c5 .cloud-img, .c8 .cloud-img { transform: scaleX(-1); }
+.c4 .cloud-img, .c9 .cloud-img { transform: rotate(-8deg); }
 .cloud-flash {
   position: absolute;
-  z-index: 3;
-  inset: 8% 8% 10% 8%;
+  inset: 20%;
   opacity: 0;
   pointer-events: none;
-  background:
-    radial-gradient(22% 18% at 50% 50%, rgba(255,252,245,0) 0 18%, rgba(255,252,245,.98) 40%, rgba(255,252,245,.28) 60%, transparent 82%),
-    radial-gradient(42% 34% at 52% 52%, rgba(165,0,38,0) 0 25%, rgba(165,0,38,.50) 48%, transparent 82%);
-  filter: blur(28px);
+  background: radial-gradient(ellipse, rgba(239,167,105,.72), rgba(122,31,11,.3) 38%, transparent 68%);
+  filter: blur(16px);
   mix-blend-mode: screen;
 }
-.cloud.flash-hit .cloud-flash {
-  animation: cloudFlash .42s ease-out 1;
+.cloud.flash-hit .cloud-flash { animation: cloudFlash .42s ease-out 1; }
+.storm-layer.is-live .cloud-drift {
+  animation: cloudFloat var(--drift-duration, 6s) ease-in-out infinite;
+  animation-delay: var(--drift-delay, 0s);
 }
-.storm-layer.is-live .cloud {
-  animation: cloudFloat 3.8s ease-in-out infinite;
-}
-.c1 { left: -2vw; top: 5vh; width: 28vw; height: 16vw; animation-delay: -.2s; }
-.c2 { left: 16vw; top: 9vh; width: 24vw; height: 14vw; animation-delay: -.9s; }
-.c3 { left: -3vw; top: 24vh; width: 25vw; height: 15vw; animation-delay: -1.4s; }
-.c4 { left: 19vw; top: 28vh; width: 22vw; height: 13vw; animation-delay: -2.1s; }
-.c5 { left: 1vw; top: 43vh; width: 26vw; height: 15vw; animation-delay: -2.6s; }
-.c6 { left: 16vw; top: 52vh; width: 22vw; height: 13vw; animation-delay: -3.1s; }
-.c7 { left: 7vw; top: 17vh; width: 16vw; height: 10vw; animation-delay: -1.7s; }
+.c1 { left: -12vw; top: -12vh; width: 47vw; height: 29vw; --drift-delay: -.2s; --drift-duration: 6.8s; }
+.c2 { left: 13vw; top: -8vh; width: 44vw; height: 27vw; --drift-delay: -.9s; --drift-duration: 7.4s; }
+.c3 { left: -12vw; top: 15vh; width: 42vw; height: 26vw; --drift-delay: -1.4s; }
+.c4 { left: 18vw; top: 18vh; width: 36vw; height: 23vw; --drift-delay: -2.1s; --drift-duration: 6.5s; }
+.c5 { left: -13vw; top: 38vh; width: 48vw; height: 30vw; --drift-delay: -2.6s; --drift-duration: 7.2s; }
+.c6 { left: 17vw; top: 44vh; width: 36vw; height: 23vw; --drift-delay: -3.1s; }
+.c7 { left: 1vw; top: 8vh; width: 30vw; height: 19vw; --drift-delay: -1.7s; --drift-duration: 5.8s; }
+.c8 { left: 27vw; top: 3vh; width: 30vw; height: 19vw; --drift-delay: -3.8s; --drift-duration: 7.6s; }
+.c9 { left: 26vw; top: 34vh; width: 30vw; height: 19vw; --drift-delay: -4.5s; --drift-duration: 6.4s; }
+.c10 { left: -5vw; top: 63vh; width: 38vw; height: 24vw; --drift-delay: -2.8s; --drift-duration: 7s; }
 
 @keyframes cloudFloat {
-  0%, 100% { transform: translate3d(0, -12px, 0) rotate(-0.6deg) scale(1); }
-  50% { transform: translate3d(0, 18px, 0) rotate(0.8deg) scale(1.025); }
+  0%, 100% { translate: -7px -14px; rotate: -.6deg; }
+  50% { translate: 9px 17px; rotate: .8deg; }
 }
 @keyframes cloudFlash {
   0% { opacity: 0; }
@@ -222,9 +209,9 @@ body.locked { overflow: hidden; }
   opacity: 0;
   transform: translate3d(0, -76px, 0);
   will-change: opacity, transform;
-  -webkit-text-stroke: .45px rgba(10, 4, 6, .9);
+  -webkit-text-stroke: 1.8px var(--rust);
   paint-order: stroke fill;
-  text-shadow: 0 2px 1px #12080c, 0 0 5px rgba(0,0,0,.8);
+  text-shadow: 0 2px 0 #7a1f0b, 0 4px 2px #260b06, 0 0 7px rgba(122,31,11,.45);
 }
 .hero-title .char {
   --spark: 0;
@@ -242,17 +229,22 @@ body.locked { overflow: hidden; }
   text-shadow:
     0 0 2px #fffaf2,
     0 0 7px rgba(255,245,237,.95),
-    0 0 17px rgba(227,130,155,.7),
-    0 0 28px rgba(130,0,30,.45);
+    0 0 17px rgba(187,77,35,.7),
+    0 0 28px rgba(122,31,11,.45);
   pointer-events: none;
 }
+.hero-title.is-fixed { animation: titleFloat 5.6s ease-in-out infinite; }
 .hero-title.is-fixed .char {
   animation: letterLevitate 4.8s ease-in-out infinite;
   animation-delay: calc(var(--i, 0) * -0.115s);
 }
+@keyframes titleFloat {
+  0%, 100% { translate: 0 -8px; }
+  50% { translate: 3px 9px; }
+}
 @keyframes letterLevitate {
-  0%, 100% { transform: translate3d(0, -1px, 0); }
-  50% { transform: translate3d(0, 3px, 0); }
+  0%, 100% { translate: 0 -1px; }
+  50% { translate: 0 3px; }
 }
 .title-portfolio { font-size: clamp(76px, 8.4vw, 142px); }
 .title-meftah { font-size: clamp(62px, 6.65vw, 112px); margin-top: .12em; }
@@ -348,8 +340,8 @@ body.locked { overflow: hidden; }
   animation-delay: var(--delay);
 }
 @keyframes metalFloat {
-  0%, 100% { transform: translate3d(0, -10px, 0) rotate(calc(var(--float-rot) * -1)); }
-  50% { transform: translate3d(0, 16px, 0) rotate(var(--float-rot)); }
+  0%, 100% { translate: 0 -10px; rotate: calc(var(--float-rot) * -1); }
+  50% { translate: 0 16px; rotate: var(--float-rot); }
 }
 
 .liquid-btn {
@@ -495,13 +487,16 @@ body.locked { overflow: hidden; }
 @media (max-width: 950px) {
 
   .storm-layer { opacity: .92; }
-  .c1 { left: -10vw; top: 10vh; width: 46vw; height: 26vw; }
-  .c2 { left: 20vw; top: 14vh; width: 38vw; height: 22vw; }
-  .c3 { left: -10vw; top: 32vh; width: 44vw; height: 26vw; }
-  .c4 { left: 18vw; top: 38vh; width: 34vw; height: 20vw; }
-  .c5 { left: -5vw; top: 56vh; width: 42vw; height: 24vw; }
-  .c6 { left: 18vw; top: 62vh; width: 32vw; height: 18vw; }
-  .c7 { left: 10vw; top: 24vh; width: 28vw; height: 16vw; }
+  .c1 { left: -24vw; top: -2vh; width: 75vw; height: 47vw; }
+  .c2 { left: 17vw; top: 0; width: 66vw; height: 42vw; }
+  .c3 { left: -21vw; top: 23vh; width: 70vw; height: 44vw; }
+  .c4 { left: 17vw; top: 29vh; width: 60vw; height: 38vw; }
+  .c5 { left: -19vw; top: 46vh; width: 74vw; height: 47vw; }
+  .c6 { left: 20vw; top: 57vh; width: 60vw; height: 38vw; }
+  .c7 { left: -7vw; top: 11vh; width: 54vw; height: 34vw; }
+  .c8 { left: 48vw; top: 10vh; width: 50vw; height: 32vw; }
+  .c9 { left: 43vw; top: 44vh; width: 50vw; height: 32vw; }
+  .c10 { left: -12vw; top: 72vh; width: 65vw; height: 41vw; }
   .hero-title {
     top: 10vh;
     left: 5vw;
@@ -531,8 +526,17 @@ body.locked { overflow: hidden; }
   .hover-plate::before { left: 32px; }
   .hover-plate::after { left: 8px; width: 45px; }
 }
+/* Le flottement demandé reste doux ; les flashs sont déjà désactivés en JS. */
 @media (prefers-reduced-motion: reduce) {
+  .hero-title.is-fixed,
   .hero-title.is-fixed .char,
-  .storm-layer.is-live .cloud,
-  .nav-item.is-floating .btn-float { animation: none; }
+  .storm-layer.is-live .cloud-drift,
+  .nav-item.is-floating .btn-float {
+    animation-name: gentleFloat;
+    animation-duration: 9s;
+  }
+}
+@keyframes gentleFloat {
+  0%, 100% { translate: 0 -3px; }
+  50% { translate: 0 3px; }
 }
