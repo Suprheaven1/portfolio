@@ -159,6 +159,8 @@ function splitHeroTitleLetters(){
       span.className = 'char';
       span.style.setProperty('--i', i);
       span.textContent = ch === ' ' ? '\u00A0' : ch;
+      span.dataset.char = span.textContent;
+      span.setAttribute('aria-hidden', 'true');
       line.appendChild(span);
     });
   });
@@ -167,15 +169,10 @@ splitHeroTitleLetters();
 
 function startCloudLightning(){
   const triggerFlash = cloud => {
+    if (cloud.classList.contains('flash-hit')) return;
+    const light = cloud.querySelector('.cloud-flash');
+    light.addEventListener('animationend', () => cloud.classList.remove('flash-hit'), { once: true });
     cloud.classList.add('flash-hit');
-    setTimeout(() => cloud.classList.remove('flash-hit'), 320);
-
-    if (Math.random() > 0.58) {
-      setTimeout(() => {
-        cloud.classList.add('flash-hit');
-        setTimeout(() => cloud.classList.remove('flash-hit'), 260);
-      }, gsap.utils.random(90, 180));
-    }
   };
 
   const loop = () => {
@@ -188,22 +185,19 @@ function startCloudLightning(){
 }
 
 function startElectricTitleFlicker(){
-  // Micro-impulsions lumineuses irrégulières, volontairement très brèves.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const lines = [...heroTitle.querySelectorAll('.title-line')];
   const pulse = () => {
-    heroTitle.classList.add('electric-hit');
-    gsap.to('.hero-title .char', {
-      opacity: () => gsap.utils.random(.62, 1),
-      x: () => gsap.utils.random(-1.2, 1.2),
-      duration: .035,
-      stagger: { each: .006, from: 'random' },
-      yoyo: true,
-      repeat: 1,
-      ease: 'steps(1)',
-      onComplete: () => {
-        heroTitle.classList.remove('electric-hit');
-        gsap.set('.hero-title .char', { opacity: 1, x: 0 });
-      }
-    });
+    // Un petit groupe contigu s'allume ; les lettres restent nettes et en place.
+    const line = lines[Math.floor(Math.random() * lines.length)];
+    const letters = [...line.querySelectorAll('.char')];
+    const first = Math.floor(Math.random() * letters.length);
+    const group = letters.slice(first, first + gsap.utils.random(2, 4, 1));
+    const flash = gsap.timeline();
+    flash.to(group, { '--spark': 1, duration: .045, stagger: .018, ease: 'power2.out' })
+      .to(group, { '--spark': .12, duration: .065, ease: 'power1.in' })
+      .to(group, { '--spark': .85, duration: .035, stagger: .012, ease: 'power2.out' })
+      .to(group, { '--spark': 0, duration: .26, ease: 'power2.out' });
     setTimeout(pulse, gsap.utils.random(1700, 4200));
   };
   setTimeout(pulse, 1200);
@@ -247,7 +241,7 @@ function launch(){
   clouds.forEach((cloud, i) => {
     tl.fromTo(cloud,
       { opacity: 0, x: cloudFrom[i].x, y: cloudFrom[i].y, scale: cloudFrom[i].scale, filter: 'blur(18px)' },
-      { opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(1.5px)', duration: 1.3, ease: 'expo.out' },
+      { opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(.35px)', duration: 1.3, ease: 'expo.out' },
       2.10 + i * .06
     );
   });
@@ -275,16 +269,17 @@ function launch(){
     ease: 'expo.out'
   }, 2.34);
 
-  tl.to('.title-line', { opacity: .15, x: -5, filter: 'blur(2px)', duration: .05, stagger: .045, ease: 'steps(1)' }, 3.06);
-  tl.to('.title-line', { opacity: 1, x: 3, filter: 'blur(0px)', duration: .085, stagger: .032, ease: 'steps(1)' }, 3.16);
-  tl.to('.title-line', { opacity: .35, x: -2, y: '+=2', duration: .055, stagger: .036, ease: 'steps(1)' }, 3.34);
-  tl.to('.title-line', { opacity: 1, x: 0, y: 0, duration: .46, stagger: .042, ease: 'power3.out' }, 3.44);
+  // L'impulsion d'entrée éclaire les glyphes sans les décaler ni les flouter.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    tl.to('.hero-title .char', { '--spark': .9, duration: .08, stagger: .012 }, 3.32);
+    tl.to('.hero-title .char', { '--spark': 0, duration: .25, stagger: .012 }, 3.78);
+  }
 
   tl.call(() => {
     heroTitle.classList.add('is-fixed');
     stormLayer.classList.add('is-live');
     startElectricTitleFlicker();
-    startCloudLightning();
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startCloudLightning();
   }, null, 3.88);
 
   // Entrée des boutons : ils glissent depuis le flux de métal liquide.
@@ -304,4 +299,8 @@ function launch(){
   }, 2.90);
 }
 
-viewButton.addEventListener('click', launch);
+viewButton.addEventListener('click', () => {
+  viewButton.disabled = true;
+  // Les métriques des polices sont prêtes avant l'entrée du titre.
+  document.fonts.ready.then(launch);
+}, { once: true });
