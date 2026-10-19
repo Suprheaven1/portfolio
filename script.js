@@ -185,7 +185,7 @@ function startFloatingMotion() {
   floatingStarted = true;
   // Deux couches distinctes : entrée sur .nav-item, oscillation sur .btn-float.
   document.querySelectorAll('.btn-float').forEach((button, i) => {
-    const amplitude = 30; // 60 px de trajet vertical total.
+    const amplitude = 15; // 30 px de trajet vertical total.
     const direction = i % 2 ? -1 : 1;
     gsap.fromTo(button,
       { x: -12 * direction, y: -amplitude, rotation: -3 * direction },
@@ -197,8 +197,8 @@ function startFloatingMotion() {
   document.querySelectorAll('.cloud-drift').forEach((cloud, i) => {
     const direction = i % 2 ? -1 : 1;
     gsap.fromTo(cloud,
-      { x: -17 * direction, y: -22.5, rotation: -1.8 * direction },
-      { x: 17 * direction, y: 22.5, rotation: 1.8 * direction,
+      { x: -15 * direction, y: -15, rotation: -1.8 * direction },
+      { x: 15 * direction, y: 15, rotation: 1.8 * direction,
         duration: 2.8 + i * .22, ease: 'sine.inOut', repeat: -1, yoyo: true,
         delay: -i * .8 }
     );
