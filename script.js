@@ -179,6 +179,32 @@ new ResizeObserver(syncCloudBackdrop).observe(heroTitle);
 window.addEventListener('resize', syncCloudBackdrop);
 document.fonts.ready.then(syncCloudBackdrop);
 
+let floatingStarted = false;
+function startFloatingMotion() {
+  if (floatingStarted) return;
+  floatingStarted = true;
+  // Deux couches distinctes : entrée sur .nav-item, oscillation sur .btn-float.
+  document.querySelectorAll('.btn-float').forEach((button, i) => {
+    const amplitude = [44, 40, 42, 38][i % 4];
+    const direction = i % 2 ? -1 : 1;
+    gsap.fromTo(button,
+      { x: -12 * direction, y: -amplitude, rotation: -3 * direction },
+      { x: 12 * direction, y: amplitude, rotation: 3 * direction,
+        duration: 2.1 + i * .16, ease: 'sine.inOut', repeat: -1, yoyo: true,
+        delay: -i * .65 }
+    );
+  });
+  document.querySelectorAll('.cloud-drift').forEach((cloud, i) => {
+    const direction = i % 2 ? -1 : 1;
+    gsap.fromTo(cloud,
+      { x: -17 * direction, y: -36, rotation: -1.8 * direction },
+      { x: 17 * direction, y: 36, rotation: 1.8 * direction,
+        duration: 2.8 + i * .22, ease: 'sine.inOut', repeat: -1, yoyo: true,
+        delay: -i * .8 }
+    );
+  });
+}
+
 function startCloudLightning(){
   const triggerFlash = cloud => {
     if (cloud.classList.contains('flash-hit')) return;
@@ -294,6 +320,7 @@ function launch(){
     document.querySelectorAll('.nav-item').forEach(item => item.classList.add('is-floating'));
     heroTitle.classList.add('is-fixed');
     stormLayer.classList.add('is-live');
+    startFloatingMotion();
     startElectricTitleFlicker();
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startCloudLightning();
   }, null, 4.25);

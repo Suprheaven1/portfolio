@@ -74,7 +74,7 @@ body.locked { overflow: hidden; }
   position: relative;
   width: 100%;
   height: 100%;
-  will-change: translate;
+  will-change: transform;
 }
 .cloud-img {
   width: 100%;
@@ -99,10 +99,6 @@ body.locked { overflow: hidden; }
   mix-blend-mode: screen;
 }
 .cloud.flash-hit .cloud-flash { animation: cloudFlash .42s ease-out 1; }
-.storm-layer.is-live .cloud-drift {
-  animation: cloudFloat var(--drift-duration, 6s) ease-in-out infinite;
-  animation-delay: var(--drift-delay, 0s);
-}
 /* Cinq volumes superposés : un fond compact plutôt que des nuages dispersés. */
 .c1 { left: -8%; top: -8%; width: 92%; height: 63%; --drift-delay: -.2s; --drift-duration: 5.8s; }
 .c2 { left: 24%; top: -1%; width: 80%; height: 60%; --drift-delay: -1.4s; --drift-duration: 6.4s; }
@@ -110,10 +106,6 @@ body.locked { overflow: hidden; }
 .c4 { left: 18%; top: 35%; width: 82%; height: 61%; --drift-delay: -3.6s; --drift-duration: 6.2s; }
 .c5 { left: -10%; top: 57%; width: 82%; height: 56%; --drift-delay: -1.8s; --drift-duration: 6s; }
 
-@keyframes cloudFloat {
-  0%, 100% { translate: -16px -32px; rotate: -1.6deg; }
-  50% { translate: 18px 34px; rotate: 1.8deg; }
-}
 @keyframes cloudFlash {
   0% { opacity: 0; }
   15% { opacity: 1; }
@@ -336,23 +328,16 @@ body.locked { overflow: hidden; }
   z-index: 2;
   display: block;
   transform-origin: 50% 50%;
-  transition: transform .22s cubic-bezier(.18,.9,.18,1), filter .22s ease;
+  transition: filter .22s ease;
   filter: drop-shadow(13px 16px 0 rgba(0,0,0,.82)) drop-shadow(0 22px 26px rgba(0,0,0,.52));
 }
-.nav-item.is-floating .btn-float {
-  animation: metalFloat 3.6s ease-in-out infinite;
-  animation-delay: var(--delay);
-}
-@keyframes metalFloat {
-  0%, 100% { translate: -8px -28px; rotate: calc(var(--float-rot) * -2.2); }
-  50% { translate: 9px 30px; rotate: calc(var(--float-rot) * 2.2); }
-}
-
+/* Le flottement est piloté par GSAP sur cette couche, indépendamment de l'entrée. */
 .liquid-btn {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
+  transition: transform .22s cubic-bezier(.18,.9,.18,1);
 }
 .btn-edge,
 .btn-fill,
@@ -424,9 +409,12 @@ body.locked { overflow: hidden; }
 }
 .nav-item:hover .btn-float,
 .nav-item:focus-visible .btn-float {
-  transform: scale(var(--hover-scale)) rotate(-1deg) translateY(-2px);
   filter: drop-shadow(18px 19px 0 rgba(0,0,0,.95)) drop-shadow(0 28px 34px rgba(0,0,0,.64));
-  animation-play-state: paused;
+}
+/* Le zoom de survol est interne : il ne suspend jamais l'oscillation. */
+.nav-item:hover .liquid-btn,
+.nav-item:focus-visible .liquid-btn {
+  transform: scale(var(--hover-scale)) rotate(-1deg);
 }
 .nav-item:hover .btn-text,
 .nav-item:focus-visible .btn-text {
@@ -520,12 +508,10 @@ body.locked { overflow: hidden; }
   .hover-plate::before { left: 32px; }
   .hover-plate::after { left: 8px; width: 45px; }
 }
-/* Le flottement demandé reste doux ; les flashs sont déjà désactivés en JS. */
+/* Les flashes sont désactivés en JS en mode réduit. Le flottement demandé reste actif. */
 @media (prefers-reduced-motion: reduce) {
   .hero-title.is-fixed,
-  .hero-title.is-fixed .char,
-  .storm-layer.is-live .cloud-drift,
-  .nav-item.is-floating .btn-float {
+  .hero-title.is-fixed .char {
     animation-name: gentleFloat;
     animation-duration: 9s;
   }
